@@ -36,19 +36,17 @@ impl BlockChain {
     }
 
 
-    pub fn add_block(&mut self, data: String) -> &Block {
-        let block = self.mk_block( data.clone()).expect("error creating block");
-        self.blocks.push(block);
-        self.blocks.last().expect("has a block")
-    }
-    fn mk_block(&mut self, data: String) -> Option<Block> {
-        let last_block = self.blocks.last().expect("there is at least one block");
-        let new_block = Block::new(last_block.id.clone() + 1, last_block.hash.clone(), data);
-        if self.is_block_valid(&new_block, last_block) {
-            return Some(new_block)
+    pub fn add_block(&mut self, block: Block) -> Option<&Block> {
+        // let block = self.mk_block( data.clone()).expect("error creating block");
+        let last_block = self.blocks.last().expect("has a block");
+        if self.is_block_valid(&block, last_block) {
+            self.blocks.push(block);
+            return self.blocks.last()
         }
         None
-
+    }
+    pub fn mk_block(&mut self, data: String) -> Option<Block> {
+        self.blocks.last().map(|last_block| Block::new(last_block.id.clone() + 1, last_block.hash.clone(), data))
     }
 
     fn is_block_valid(&self, block: &Block, previous_block: &Block) -> bool {
